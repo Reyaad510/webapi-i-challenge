@@ -1,9 +1,15 @@
 // implement your API here, initial commit
 
 const express = require('express');
-const server = express();
 
 const db = require('./data/db.js');
+const server = express();
+
+
+
+// middleware
+
+server.use(express.json());
 
 
 
@@ -41,13 +47,29 @@ server.get('/api/users/:id', (req, res) => {
 
 
 // Create - Add a new user to the list
+server.post('/api/users', (req, res) => {
+    const newUser = req.body;
+    console.log(req.body)
+
+    if(!newUser.name || !newUser.bio) {
+        res.status(400).json({ errorMessage: "Please provide name and bio for the user." })
+    } else {
+        db.insert(newUser)
+          .then(user => {
+              res.status(201).json(user)
+          })
+          .catch(err => {
+              res.status(500).json({ error: "There was an error while saving the user to the database" })
+          })
+    }
+
+})
 
 
 
 
-// middleware
 
-server.use(express.json());
+
 
 
 
