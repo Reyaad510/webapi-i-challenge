@@ -32,18 +32,20 @@ server.get('/api/users', (req, res) => {
 
 server.get('/api/users/:id', (req, res) => {
     const { id } = req.params
-    if (db.findById(id) !== id) {
+
+db.findById(id)
+  .then(user => {
+      if(user) {
+          res.json(user);
+      } else {
         res.status(404).json({ message: "The user with the specified ID does not exist." })
-    } else {
-    db.findById(id)
-      .then(user => {
-          res.send(user)
-      })
-      .catch(err => {
-          res.status(500).json({ error: "The user information could not be retrieved." })
-      })
-    }
-})
+      }
+  })
+  .catch(err => {
+              res.status(500).json({ error: "The user information could not be retrieved." })
+          })
+        })
+
 
 
 // Create - Add a new user to the list
@@ -62,8 +64,29 @@ server.post('/api/users', (req, res) => {
               res.status(500).json({ error: "There was an error while saving the user to the database" })
           })
     }
-
 })
+
+
+// Delete - delete a user from the list by using id
+
+server.delete('/api/users/:id', (req, res) => {
+   const { id } = req.params;
+
+   db.remove(id)
+   .then(removedUser => {
+    if(removedUser) {
+        res.json(removedUser);
+    } else {
+      res.status(404).json({ message: "The user with the specified ID does not exist." })
+    }
+})
+.catch(err => {
+            res.status(500).json({ error: "The user could not be removed." })
+        })
+      });
+   
+
+
 
 
 
